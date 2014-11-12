@@ -1,0 +1,12 @@
+{
+    "name": "root/kitasenju_station_view",
+    "authors": [
+        {
+            "name": "elzzup",
+            "email": "guild0105@gmail.com"
+        }
+    ],
+    "require": {
+        "slim/slim": "2.*"
+    }
+}
