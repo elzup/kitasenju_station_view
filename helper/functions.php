@@ -64,3 +64,8 @@ function is_saturday($timestamp = NULL) {
     $ymd = split_ymd($timestamp);
     return date("w", mktime(0,0,0, $ymd[1] ,$ymd[2], $ymd[0])) == 6;
 }
+
+function get_colon_value($text) {
+    $arr = explode(':', $text);
+    return $arr[1];
+}
