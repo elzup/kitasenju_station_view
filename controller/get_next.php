@@ -3,16 +3,21 @@
 function get_future_trains($station_name) {
     $station_list = get_station_list($station_name);
     $weekday = check_weekday();
+    $weekday_tommorow = check_weekday(strtotime("+1day"));
     $trains = array();
     foreach ($station_list as $st) {
         $station = get_colon_value($st->{"owl:sameAs"});
         $railway = get_colon_value($st->{"odpt:railway"});
         $times = get_table_from_station($st);
         foreach ($times->{'odpt:' . $weekday} as $time) {
-            $trains[] = new Train($station, $railway, get_colon_value($time->{"odpt:destinationStation"}), $time->{"odpt:departureTime"});
+            $trains[] = new Train($station, $railway, get_colon_value($time->{"odpt:destinationStation"}), strtotime($time->{"odpt:departureTime"}));
+        }
+        foreach ($times->{'odpt:' . $weekday_tommorow} as $time) {
+            $trains[] = new Train($station, $railway, get_colon_value($time->{"odpt:destinationStation"}), strtotime($time->{"odpt:departureTime"} . ' + 1day'));
         }
     }
-    var_dump($trains);
+    $trains = sort_trains_by_time($trains);
+    return $trains;
 }
 
 function get_next($station, $direction, $time = NULL) {
@@ -42,13 +47,12 @@ function get_next($station, $direction, $time = NULL) {
 
 }
 
-function sort_trains_by_time($trains) {
-    usort($times, function($a, $b) {
-        return ($a->{'odpt:departureTime'} == $b->{'odpt:departureTime'} ? 0 : ($a->{'odpt:departureTime'} > $b->{'odpt:departureTime'} ? 1 : -1));
+function sort_trains_by_time(array $trains) {
+    usort($trains, function($a, $b) {
+        return ($a->timestamp == $b->timestamp ? 0 : ($a->timestamp > $b->timestamp ? 1 : -1));
     });
     return $trains;
 }
-
 
 function get_station_list($station) {
     $url_pref = 'https://api.tokyometroapp.jp/api/v2/';
@@ -75,7 +79,6 @@ function get_time_tables($odpt_station, $direction = NULL) {
 function get_table_from_station($station) {
     $tmp = explode(':', $station->{'owl:sameAs'});
     $code = $tmp[1];
-    $times = array();
     return get_time_tables($code);
 }
 

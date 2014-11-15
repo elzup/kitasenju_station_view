@@ -60,6 +60,7 @@ function is_sunday($timestamp = NULL) {
     $ymd = split_ymd($timestamp);
     return date("w", mktime(0,0,0, $ymd[1] ,$ymd[2], $ymd[0])) == 0;
 }
+
 function is_saturday($timestamp = NULL) {
     $ymd = split_ymd($timestamp);
     return date("w", mktime(0,0,0, $ymd[1] ,$ymd[2], $ymd[0])) == 6;
