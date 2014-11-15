@@ -1,3 +1,4 @@
 keys.php
 vendor/
 composer.lock
+components/
