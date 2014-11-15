@@ -1,5 +1,17 @@
 <?php
 
+function load_trains() {
+    $url_head = 'https://api.tokyometroapp.jp/api/v2/datapoints';
+    $url_foot = '?rdf:type=odpt:Train&acl:consumerKey=' . ACCESS_TOKEN;
+    echo $url = $url_head . $url_foot;
+    $trains = json_decode(file_get_contents($url));
+    $train_list = array();
+    foreach ($trains as $train) {
+        $train_list[] = new TrainData($train);
+    }
+    return $train_list;
+}
+
 function get_future_trains($station_name) {
     $station_list = get_station_list($station_name);
     $weekday = check_weekday();

@@ -6,10 +6,11 @@ require_once("../class/railway_data.php");
 require_once("../class/station_data.php");
 
 $url_head = 'https://api.tokyometroapp.jp/api/v2/datapoints';
-$url_foot = '?rdf:type=odpt:Railway&acl:consumerKey=' . ACCESS_TOKEN;
+$url_foot = '?rdf:type=odpt:Train&acl:consumerKey=' . ACCESS_TOKEN;
 echo $url = $url_head . $url_foot;
 $lines = json_decode(file_get_contents($url));
 var_dump($lines);
+exit;
 //var_dump($lines);
 $railways = array();
 foreach ($lines as $line) {

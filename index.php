@@ -3,17 +3,21 @@
 require_once('./config/keys.php');
 require_once('./config/constants.php');
 require_once('./helper/functions.php');
-require_once('./class/train.php');
 require_once('./class/railway_data.php');
 require_once('./class/station_data.php');
+require_once('./class/train_data.php');
 require_once('./model/json.php');
 
 require_once('./controller/get_next.php');
 
 $railways = load_railways();
 
+$trains = load_trains();
+var_dump($trains);
+exit;
+
 // 東京中心
-$lat = 35.6925207;
+$lat =  35.6925207;
 $lon = 139.7821457;
 $zoom = 12;
 $maptype = "ROADMAP";
@@ -31,20 +35,29 @@ $locs = array();
     <meta charset="UTF-8" />
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
     <title>Railway Map</title>
+<style>
+      html, body, #map-canvas {
+        height: 100%;
+        margin: 0px;
+        padding: 0px
+      }
+</style>
     <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
     <script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?key=<?= GOOGLE_API_KEY ?>&sensor=TRUE"></script>
-</head>
-<body onload="initialize()">
-<script type="text/javascript">
+<script>
 
+var map;
+var infowindow;
+var geocoder;
 function initialize() {
     var mapOptions = {
-    center: new google.maps.LatLng(<?= $lat . ', ' . $lon ?>), zoom: <?= $zoom ?>,
+        center: new google.maps.LatLng(<?= $lat . ',' . $lon ?>),
+        zoom: <?= $zoom ?>,
         mapTypeId: google.maps.MapTypeId.<?= $maptype ?>
     };
-    var map = new google.maps.Map(document.getElementById("map_canvas"), mapOptions);
-    var infowindow = new google.maps.InfoWindow();
-    var geocoder = new google.maps.Geocoder();
+    map = new google.maps.Map(document.getElementById("map_canvas"), mapOptions);
+    infowindow = new google.maps.InfoWindow();
+    geocoder = new google.maps.Geocoder();
 
     var railways = <?= json_encode($railways) ?>;
     console.log(railways);
@@ -52,15 +65,15 @@ function initialize() {
     
     for (var k = 0; k < railways.length; k++) {
         var railway = railways[k];
+        var col = railway.color;
         var pre_loc = "";
         for (var j = 0; j < railway.stations.length; j++) {
             var st = railway.stations[j];
             var lat = st.location.lat;
             var lon = st.location.lon;
     
-            var col = '#ff0000';
             set_marker(col, lat, lon, map, infowindow, "test");
-            if (!pre_loc) {
+            if (pre_loc) {
                 var points = [
                     new google.maps.LatLng(pre_loc.lat, pre_loc.lon),
                     new google.maps.LatLng(lat, lon)
@@ -99,7 +112,11 @@ function set_marker(col, lat, lon, map, infowindow, text) {
     })(marker));
 }
 
+google.maps.event.addDomListener(window, 'load', initialize);
+
 </script>
+</head>
+<body>
 <div id="wrapper">
     <h1>Railway Map</h1>
 </div>
