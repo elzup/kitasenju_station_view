@@ -170,6 +170,18 @@ function set_marker(col, lat, lon, map, infowindow, text, code) {
 
 google.maps.event.addDomListener(window, 'load', initialize);
 
+$(function() {
+    $helpdiv = $('.help-div');
+    $helpdiv.hide();
+    $('.help').click(function() {
+        if ($helpdiv.css('display') == 'none') {
+            $helpdiv.slideDown();
+        } else {
+            $helpdiv.slideUp();
+        }
+    });
+});
+
 </script>
 </head>
 <body>
@@ -181,6 +193,17 @@ google.maps.event.addDomListener(window, 'load', initialize);
         <div class="description">
             <p>東京メトロで走っている電車を表示します</p>
             <p><?php echo date('Y年m月d日 H時i分') ?> 現在走っている電車は <?= count($trains) ?> 車です</p>
+            <p class="help open"><span>ヘルプ</span></p>
+            <div class="help-div">
+                <ul>
+                    <li>運行中の電車にマーカーが表示されています</li>
+                    <li>駅のマークにマウスをのせると駅名が表示されます</li>
+                    <li>右のラインマークをクリックするとフィルターを書けれます</li>
+                    <li>フィルターを消したい場合はタイトルリンクをクリック</li>
+                    <li>GoogleMapの操作方法と同じです</li>
+                </ul>
+            <p class="help close"><span>閉じる</span></p>
+            </div>
         </div>
         <div id="controllers">
             <?php foreach ($linemark_chars as $c) { ?>
