@@ -63,7 +63,6 @@ class TrainData {
         $time_start = NULL;
         $time_end = NULL;
         $pre = NULL;
-        echo "++" . $now;
         foreach ($lib_timetables->{$this->fromStation}->{TrainData::$type}->{$this->trainType} as $time) {
             $time = float_time4($time);
             if ($now > $time) {
@@ -82,7 +81,6 @@ class TrainData {
             }
             $time_end = $time;
         }
-        echo "[[ {$time_start} -- {$time_end} ]]\n";
         return array($time_start, $time_end);
     }
 

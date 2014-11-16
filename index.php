@@ -71,6 +71,7 @@ function initialize() {
     for (var k = 0; k < railways.length; k++) {
         var railway = railways[k];
         var col = railway.color;
+        console.log(col);
         var pre_loc = "";
         for (var j = 0; j < railway.stations.length; j++) {
             var st = railway.stations[j];
