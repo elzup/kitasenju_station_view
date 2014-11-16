@@ -10,13 +10,23 @@ require_once('./model/json.php');
 
 require_once('./controller/get_next.php');
 
+$target_rail = @$_GET['rail'];
+
 $railways = load_railways();
 $lib_location = load_lib_location();
 $lib_timetables = load_lib_timetable();
 $lib_color = array();
-foreach ($railways as $rail) {
+$linemark_chars = load_linemark_chars();
+foreach ($railways as $i => &$rail) {
     $lib_color[$rail->url] = $rail->color;
+    if ($target_rail && $target_rail != $linemark_chars[$i]) {
+        unset($railways[$i]);
+        continue;
+    }
+    $rail->char = $linemark_chars[$i];
 }
+$railways = array_values($railways);
+unset($linemark_chars[2]);
 
 $trains = load_trains();
 install_train($trains, $lib_location, $lib_timetables, $lib_color);
@@ -30,8 +40,6 @@ $maptype = "ROADMAP";
 
 $locs = array();
 
-$target = @$_GET['rail'];
-
 //foreach ($tweets as $i => $st) { 
 //    if (!isset($st->geo)) continue;
 //    $locs[] = '["' . escape_js_string($st->text) . '", ' . $st->geo->coordinates[0] . ', ' . $st->geo->coordinates[1] . ']';
@@ -42,14 +50,8 @@ $target = @$_GET['rail'];
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
-    <title>Railway Map</title>
-<style>
-      html, body, #map-canvas {
-        height: 100%;
-        margin: 0px;
-        padding: 0px
-      }
-</style>
+    <title>東京メトロ RailMap</title>
+<link rel="stylesheet" href="./style.css">
     <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
     <script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?key=<?= GOOGLE_API_KEY ?>&sensor=TRUE"></script>
 <script>
@@ -64,7 +66,9 @@ function initialize() {
         mapTypeId: google.maps.MapTypeId.<?= $maptype ?>
     };
     map = new google.maps.Map(document.getElementById("map_canvas"), mapOptions);
-    infowindow = new google.maps.InfoWindow();
+    infowindow = new google.maps.InfoWindow({
+        pixelOffset: new google.maps.Size(-25, 0)
+    });
     geocoder = new google.maps.Geocoder();
 
     var railways = <?= json_encode($railways) ?>;
@@ -154,15 +158,14 @@ function set_marker(col, lat, lon, map, infowindow, text, code) {
         icon: pinImage,
         map: map
     });
-    google.maps.event.addListener(marker, 'mouseover', (function(marker, user_lock, k, j) {
-        return function() {
-            infowindow.setContent(text);
-            infowindow.open(map, marker);
-            if (!!code) {
-//            infowindow.setPixelOffset(new google.maps.Size(-300, -100));
+    if (!!code) {
+        google.maps.event.addListener(marker, 'mouseover', (function(marker, user_lock, k, j) {
+            return function() {
+                infowindow.setContent(text);
+                infowindow.open(map, marker);
             }
-        }
-    })(marker));
+        })(marker));
+    }
 }
 
 google.maps.event.addDomListener(window, 'load', initialize);
@@ -171,8 +174,21 @@ google.maps.event.addDomListener(window, 'load', initialize);
 </head>
 <body>
 <div id="wrapper">
-    <h1>Railway Map</h1>
+    <header>
+        <a href="./"><h1>東京メトロ Railway Map</h1></a>
+    </header>
+    <div class="row">
+        <div class="description">
+            <p>東京メトロで走っている電車を表示します</p>
+            <p><?php echo date('Y年m月d日 H時i分') ?> 現在走っている電車は <?= count($trains) ?> 車です</p>
+        </div>
+        <div id="controllers">
+            <?php foreach ($linemark_chars as $c) { ?>
+                <a href="?rail=<?= $c ?>"><img class="linemark<?= $target_rail == $c ? " spot" : "" ?>" src="<?= PATH_LINE_MARK . $c . '.jpg' ?>" alt=""></a>
+            <?php }?>
+        </div>
+    </div>
 </div>
-<div id="map_canvas" style="width:100%; height:100%"></div>
+<div id="map_canvas" style="margin: 0 auto; width:80%; height:450px"></div>
 </body>
 </html>
