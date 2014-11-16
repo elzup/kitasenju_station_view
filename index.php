@@ -11,10 +11,11 @@ require_once('./model/json.php');
 require_once('./controller/get_next.php');
 
 $railways = load_railways();
+$lib_location = load_lib_location();
+$lib_timetables = load_lib_timetable();
 
 $trains = load_trains();
-var_dump($trains);
-exit;
+$trains = install_train($trains, $lib_location);
 
 // 東京中心
 $lat =  35.6925207;
@@ -23,6 +24,8 @@ $zoom = 12;
 $maptype = "ROADMAP";
 
 $locs = array();
+
+$target = @$_GET['rail'];
 
 //foreach ($tweets as $i => $st) { 
 //    if (!isset($st->geo)) continue;
@@ -61,8 +64,10 @@ function initialize() {
 
     var railways = <?= json_encode($railways) ?>;
     console.log(railways);
+    var trains = <?= json_encode($trains) ?>;
+    console.log(trains);
 
-    
+    // set station markers
     for (var k = 0; k < railways.length; k++) {
         var railway = railways[k];
         var col = railway.color;
@@ -72,7 +77,7 @@ function initialize() {
             var lat = st.location.lat;
             var lon = st.location.lon;
     
-            set_marker(col, lat, lon, map, infowindow, "test");
+            set_marker(col, lat, lon, map, infowindow, st.name);
             if (pre_loc) {
                 var points = [
                     new google.maps.LatLng(pre_loc.lat, pre_loc.lon),
@@ -87,11 +92,25 @@ function initialize() {
                 });
                 flightPath.setMap(map);
             }
+            pre_station = st.name;
             pre_loc = st.location;
         }
     }
+
+    // set train location markers
+    for (var k = 0; k < trains.length; k++) {
+    }
     set_marker("FFAA00", <?= $lat ?>, <?= $lon ?>, map, infowindow, "画面中央");
     console.log("end");
+}
+
+function animateCircle() {
+    var count = 0;
+    setInterval(function() { count = (count + 1) % 300;
+    var icons = line.get('icons');
+    icons[0].offset = (count / 3) + '%';
+    line.set('icons', icons);
+    }, 20);
 }
 
 function set_marker(col, lat, lon, map, infowindow, text) {

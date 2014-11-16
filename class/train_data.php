@@ -10,6 +10,17 @@ class TrainData {
     public $toStation;
     public $delay;
 
+    public $locationFrom;
+    public $locationTo;
+    public $location;
+
+    public $timeFrom;
+    public $timeTo;
+
+    public $remainTime;
+
+    public static $type;
+
     public function __construct($obj) {
         $this->uid = $obj->{"@id"};
         $this->url = $obj->{"owl:sameAs"};
@@ -20,7 +31,42 @@ class TrainData {
         $this->fromStation = $obj->{"odpt:fromStation"};
         $this->toStation = $obj->{"odpt:toStation"};
         $this->delay = $obj->{"odpt:delay"};
+        if (TrainData::$type) {
+            TrainData::$type = check_weekday();
+        }
     }
+
+    public function install($lib_location, $lib_timetables) {
+        $this->locationFrom = $lib[$train->fromStation];
+        $this->locationTo   = $lib[$train->toStation];
+        $this->location     = $this->get_location($lib_location, $lib_timetables);
+    }
+
+    public function get_location($lib_location, $lib_timetables) {
+        list($time_start, $time_end) = $this->get_times($lib_timetables);
+        $now = float_time4(date('h:i'));
+        $raito = time_progress_raito($time_start, $time_end, $now);
+    }
+
+    public function get_times($lib_timetables) {
+        $now = float_time4(date('h:i'));
+        $time_start = NULL;
+        $time_end = NULL;
+        foreach ($lib_timetables->{$railway}[TrainData::$type] as $time) {
+            $time = float_time4($time);
+            if ($now > $time) {
+                continue;
+            }
+            if (!isset($time_start)) {
+                $time_start = $time;
+                continue;
+            }
+            $time_end = $time;
+            break;
+        }
+        return array($time_start, $time_end);
+    }
+
 }
 
 /*

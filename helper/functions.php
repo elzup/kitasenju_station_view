@@ -1,5 +1,54 @@
 <?php
 
+function generate_location_lib($railways) {
+    $lib = array();
+    foreach($railways as $rail) {
+        foreach ($rail->stations as $st) {
+            $lib[$st->url] = $st->location;
+        }
+    }
+    return $lib;
+}
+
+function install_train(&$trains, $lib_location) {
+    foreach ($trains as $key => &$train) {
+        if (!$train->toStation) {
+            unset($trains[$key]);
+            continue;
+        }
+        $train->install($lib_location, $lib_timetables);
+    }
+}
+
+// 何割終わっているか
+function time_progress_raito($time_start, $time_end, $time) {
+    list($hs, $is) = explode(':', $time_start);
+    list($he, $ie) = explode(':', $time_end);
+    list($ht, $it) = explode(':', $time);
+    $start = $hs * 60 + $is;
+    $end   = $he * 60 + $ie;
+    $p   = $ht * 60 + $it;
+    echo $diff = $end - $start;
+    echo $pdiff = $p - $start;
+    return $pdiff / $diff;
+}
+
+function calc_location($location_start, $location_end, $raito) {
+    $loc = new stdclass();
+    $loc->lat = $location_end->lat * $raito + (1 - $raito) * $location_start->lat;
+    $loc->lon = $location_end->lon * $raito + (1 - $raito) * $location_start->lon;
+    return $loc;
+}
+
+function float_time4($time) {
+    if ($time < '03:00') {
+        list($h, $i) = explode(':', $time);
+        $h += 24;
+        $time = implode(':', array($h, $i));
+        return $time;
+    }
+} 
+
 function check_weekday($timestamp = NULL) {
     if (!isset($timestamp)) {
         $timestamp = time();

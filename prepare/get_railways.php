@@ -6,11 +6,9 @@ require_once("../class/railway_data.php");
 require_once("../class/station_data.php");
 
 $url_head = 'https://api.tokyometroapp.jp/api/v2/datapoints';
-$url_foot = '?rdf:type=odpt:Train&acl:consumerKey=' . ACCESS_TOKEN;
-echo $url = $url_head . $url_foot;
+$url_foot = '?rdf:type=odpt:Railway&acl:consumerKey=' . ACCESS_TOKEN;
+$url = $url_head . $url_foot;
 $lines = json_decode(file_get_contents($url));
-var_dump($lines);
-exit;
 //var_dump($lines);
 $railways = array();
 foreach ($lines as $line) {
@@ -22,10 +20,8 @@ foreach ($lines as $line) {
         $res = json_decode(file_get_contents($url));
         $station = $res[0];
         $stations[] = new StationData($station);
-        var_dump($station);
-        exit;
     }
     $railways[] = new RailwayData($line, $stations);
 }
-//echo json_encode($railways);
+echo json_encode($railways);
 
