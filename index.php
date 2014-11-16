@@ -78,7 +78,7 @@ function initialize() {
             var lat = st.location.lat;
             var lon = st.location.lon;
     
-            set_marker(col, lat, lon, map, infowindow, st.name);
+            set_marker(col, lat, lon, map, infowindow, st.name, st.code);
             if (pre_loc) {
                 var points = [
                     new google.maps.LatLng(pre_loc.lat, pre_loc.lon),
@@ -124,11 +124,33 @@ function animateCircle() {
     }, 20);
 }
 
-function set_marker(col, lat, lon, map, infowindow, text) {
-    var pinImage = new google.maps.MarkerImage("http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|" + col,
-        new google.maps.Size(21, 34),
+function set_marker(col, lat, lon, map, infowindow, text, code) {
+    var img_path;
+    var pinImage;
+    if (!code) {
+        img_path = "http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|" + col;
+        pinImage = new google.maps.MarkerImage(
+            img_path,
+            new google.maps.Size(21, 34),
             new google.maps.Point(0, 0),
-            new google.maps.Point(10, 34));
+            new google.maps.Point(10, 34)
+        );
+    } else {
+        img_path = "<?= PATH_STATION_ICON ?>" + code + '.png';
+        pinImage = new google.maps.MarkerImage(
+            img_path,
+            new google.maps.Size(68, 68),
+            new google.maps.Point(0, 0),
+            new google.maps.Point(0, 0),
+            new google.maps.Size(20, 20)
+        );
+    }
+    var pinImage = new google.maps.MarkerImage(
+        img_path,
+        new google.maps.Size(68, 68),
+        new google.maps.Point(0, 0),
+        new google.maps.Point(10, 34),
+        new google.maps.Size(20, 20));
     marker = new google.maps.Marker({
     position: new google.maps.LatLng(lat, lon),
         icon: pinImage,
