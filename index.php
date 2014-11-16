@@ -13,9 +13,14 @@ require_once('./controller/get_next.php');
 $railways = load_railways();
 $lib_location = load_lib_location();
 $lib_timetables = load_lib_timetable();
+$lib_color = array();
+foreach ($railways as $rail) {
+    $lib_color[$rail->url] = $rail->color;
+}
 
 $trains = load_trains();
-install_train($trains, $lib_location, $lib_timetables);
+install_train($trains, $lib_location, $lib_timetables, $lib_color);
+//var_dump($trains);
 
 // 東京中心
 $lat =  35.6925207;
@@ -71,7 +76,6 @@ function initialize() {
     for (var k = 0; k < railways.length; k++) {
         var railway = railways[k];
         var col = railway.color;
-        console.log(col);
         var pre_loc = "";
         for (var j = 0; j < railway.stations.length; j++) {
             var st = railway.stations[j];
@@ -108,7 +112,7 @@ function initialize() {
         }
         var lat = train.location.lat;
         var lon = train.location.lon;
-        set_marker(col, lat, lon, map, infowindow, st.name);
+        set_marker(train.color, lat, lon, map, infowindow, train.train_number);
     }
 
 //    set_marker("FFAA00", <?= $lat ?>, <?= $lon ?>, map, infowindow, "画面中央");
@@ -141,16 +145,10 @@ function set_marker(col, lat, lon, map, infowindow, text, code) {
             img_path,
             new google.maps.Size(68, 68),
             new google.maps.Point(0, 0),
-            new google.maps.Point(0, 0),
+            new google.maps.Point(10, 10),
             new google.maps.Size(20, 20)
         );
     }
-    var pinImage = new google.maps.MarkerImage(
-        img_path,
-        new google.maps.Size(68, 68),
-        new google.maps.Point(0, 0),
-        new google.maps.Point(10, 34),
-        new google.maps.Size(20, 20));
     marker = new google.maps.Marker({
     position: new google.maps.LatLng(lat, lon),
         icon: pinImage,
@@ -160,6 +158,9 @@ function set_marker(col, lat, lon, map, infowindow, text, code) {
         return function() {
             infowindow.setContent(text);
             infowindow.open(map, marker);
+            if (!!code) {
+//            infowindow.setPixelOffset(new google.maps.Size(-300, -100));
+            }
         }
     })(marker));
 }

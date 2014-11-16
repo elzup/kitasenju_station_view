@@ -11,6 +11,8 @@ class TrainData {
     public $railDirection;
     public $delay;
 
+    public $color;
+
     public $locationFrom;
     public $locationTo;
     public $location;
@@ -41,13 +43,18 @@ class TrainData {
         }
     }
 
-    public function install($lib_location, $lib_timetables) {
+    public function install($lib_location, $lib_timetables, $lib_color) {
         $this->locationFrom = $lib_location->{$this->fromStation};
-        $this->locationTo   = $lib_location->{$this->toStation};
-        $this->location     = $this->get_location($lib_location, $lib_timetables);
+        if (isset($this->toStation)) {
+            $this->locationTo   = $lib_location->{$this->toStation};
+            $this->location     = $this->get_location($lib_location, $lib_timetables);
+        } else {
+            $this->location     = $this->locationFrom;
+        }
+        $this->color        = $lib_color[$this->railway];
     }
 
-    public function get_location($lib_location, $lib_timetables) {
+    public function get_location($lib_timetables) {
         if (!isset($lib_timetables->{$this->fromStation}->{TrainData::$type}->{$this->trainType}) || !isset($lib_timetables->{$this->toStation}->{TrainData::$type}->{$this->trainType})) {
             $raito = 0.5;
         } else {

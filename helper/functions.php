@@ -10,14 +10,9 @@ function generate_location_lib($railways) {
     return $lib;
 }
 
-function install_train(&$trains, $lib_location, $lib_timetables) {
+function install_train(&$trains, $lib_location, $lib_timetables, $lib_color) {
     foreach ($trains as $key => &$train) {
-        if (!$train->toStation) {
-            $train = NULL;
-//            unset($trains[$key]);
-            continue;
-        }
-        $train->install($lib_location, $lib_timetables);
+        $train->install($lib_location, $lib_timetables, $lib_color);
     }
 }
 
