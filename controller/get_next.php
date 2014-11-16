@@ -3,7 +3,7 @@
 function load_trains() {
     $url_head = 'https://api.tokyometroapp.jp/api/v2/datapoints';
     $url_foot = '?rdf:type=odpt:Train&acl:consumerKey=' . ACCESS_TOKEN;
-    echo $url = $url_head . $url_foot;
+    $url = $url_head . $url_foot;
     $trains = json_decode(file_get_contents($url));
     $train_list = array();
     foreach ($trains as $train) {

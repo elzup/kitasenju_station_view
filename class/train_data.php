@@ -8,6 +8,7 @@ class TrainData {
     public $terminalStation;
     public $fromStation;
     public $toStation;
+    public $railDirection;
     public $delay;
 
     public $locationFrom;
@@ -19,6 +20,8 @@ class TrainData {
 
     public $remainTime;
 
+    public $trainType;
+
     public static $type;
 
     public function __construct($obj) {
@@ -28,42 +31,58 @@ class TrainData {
         $this->railway = $obj->{"odpt:railway"};
         $this->startingStation = $obj->{"odpt:startingStation"};
         $this->terminalStation = $obj->{"odpt:terminalStation"};
+        $this->railDirection = $obj->{"odpt:railDirection"};
         $this->fromStation = $obj->{"odpt:fromStation"};
         $this->toStation = $obj->{"odpt:toStation"};
         $this->delay = $obj->{"odpt:delay"};
-        if (TrainData::$type) {
+        $this->trainType = $obj->{"odpt:trainType"};
+        if (!TrainData::$type) {
             TrainData::$type = check_weekday();
         }
     }
 
     public function install($lib_location, $lib_timetables) {
-        $this->locationFrom = $lib[$train->fromStation];
-        $this->locationTo   = $lib[$train->toStation];
+        $this->locationFrom = $lib_location->{$this->fromStation};
+        $this->locationTo   = $lib_location->{$this->toStation};
         $this->location     = $this->get_location($lib_location, $lib_timetables);
     }
 
     public function get_location($lib_location, $lib_timetables) {
-        list($time_start, $time_end) = $this->get_times($lib_timetables);
-        $now = float_time4(date('h:i'));
-        $raito = time_progress_raito($time_start, $time_end, $now);
+        if (!isset($lib_timetables->{$this->fromStation}->{TrainData::$type}->{$this->trainType}) || !isset($lib_timetables->{$this->toStation}->{TrainData::$type}->{$this->trainType})) {
+            $raito = 0.5;
+        } else {
+            list($this->timeFrom, $this->timeTo) = $this->get_times($lib_timetables);
+            $now = float_time4(date('h:i'));
+            $raito = time_progress_raito($this->timeFrom, $this->timeTo, $now);
+        }
+        return calc_location($this->locationFrom, $this->locationTo, $raito);
     }
 
     public function get_times($lib_timetables) {
-        $now = float_time4(date('h:i'));
+        $now = float_time4(date('H:i'));
         $time_start = NULL;
         $time_end = NULL;
-        foreach ($lib_timetables->{$railway}[TrainData::$type] as $time) {
+        $pre = NULL;
+        echo "++" . $now;
+        foreach ($lib_timetables->{$this->fromStation}->{TrainData::$type}->{$this->trainType} as $time) {
+            $time = float_time4($time);
+            if ($now > $time) {
+                $pre = $time;
+                continue;
+            }
+            if (!$pre) {
+                $pre = $time;
+            }
+            $time_start = $pre;
+        }
+        foreach ($lib_timetables->{$this->toStation}->{TrainData::$type}->{$this->trainType} as $time) {
             $time = float_time4($time);
             if ($now > $time) {
                 continue;
             }
-            if (!isset($time_start)) {
-                $time_start = $time;
-                continue;
-            }
             $time_end = $time;
-            break;
         }
+        echo "[[ {$time_start} -- {$time_end} ]]\n";
         return array($time_start, $time_end);
     }
 

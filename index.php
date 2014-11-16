@@ -15,7 +15,7 @@ $lib_location = load_lib_location();
 $lib_timetables = load_lib_timetable();
 
 $trains = load_trains();
-$trains = install_train($trains, $lib_location);
+install_train($trains, $lib_location, $lib_timetables);
 
 // 東京中心
 $lat =  35.6925207;
@@ -98,9 +98,19 @@ function initialize() {
     }
 
     // set train location markers
+    console.log("manage trains");
+    console.log(trains.length);
     for (var k = 0; k < trains.length; k++) {
+        var train = trains[k];
+        if (!train) {
+            continue;
+        }
+        var lat = train.location.lat;
+        var lon = train.location.lon;
+        set_marker(col, lat, lon, map, infowindow, st.name);
     }
-    set_marker("FFAA00", <?= $lat ?>, <?= $lon ?>, map, infowindow, "画面中央");
+
+//    set_marker("FFAA00", <?= $lat ?>, <?= $lon ?>, map, infowindow, "画面中央");
     console.log("end");
 }
 

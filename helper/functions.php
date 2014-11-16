@@ -10,10 +10,11 @@ function generate_location_lib($railways) {
     return $lib;
 }
 
-function install_train(&$trains, $lib_location) {
+function install_train(&$trains, $lib_location, $lib_timetables) {
     foreach ($trains as $key => &$train) {
         if (!$train->toStation) {
-            unset($trains[$key]);
+            $train = NULL;
+//            unset($trains[$key]);
             continue;
         }
         $train->install($lib_location, $lib_timetables);
@@ -28,9 +29,9 @@ function time_progress_raito($time_start, $time_end, $time) {
     $start = $hs * 60 + $is;
     $end   = $he * 60 + $ie;
     $p   = $ht * 60 + $it;
-    echo $diff = $end - $start;
-    echo $pdiff = $p - $start;
-    return $pdiff / $diff;
+    $diff = $end - $start;
+    $pdiff = $p - $start;
+    return $diff == 0 ? '0' : $pdiff / $diff;
 }
 
 function calc_location($location_start, $location_end, $raito) {
@@ -45,8 +46,8 @@ function float_time4($time) {
         list($h, $i) = explode(':', $time);
         $h += 24;
         $time = implode(':', array($h, $i));
-        return $time;
     }
+    return $time;
 } 
 
 function check_weekday($timestamp = NULL) {
