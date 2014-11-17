@@ -1,0 +1,52 @@
+@charset utf-8;
+
+#wrapper {
+    padding: 20px 20px 0 20px;
+}
+
+.row div {
+    float: left;
+}
+
+a h1 {
+    color: black;
+}
+
+p.help {
+    margin-bottom: 0px;
+}
+
+.help-block ul {
+    margin-top: 0px;
+    margin-bottom: 0px;
+}
+
+p.help span {
+    text-decoration: underline;
+}
+
+img.linemark {
+    width: 50px;
+    border: 0px;
+    border-style: inset;
+    border-color: white;
+    transition: all 1s 0s;
+}
+
+img.linemark:hover {
+    border-bottom: solid 5px #fff;
+    transition: border-bottom .3s 0s;
+}
+
+img.linemark.spot {
+    border-bottom: solid 5px #ddd;
+}
+
+html, body, #map-canvas {
+    height: 100%;
+    margin: 0px;
+    padding: 0px
+}
+
+#map-canvas {
+}

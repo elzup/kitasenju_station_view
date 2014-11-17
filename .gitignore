@@ -1,4 +1,5 @@
 keys.php
+*.xcf
 vendor/
 composer.lock
 components/
