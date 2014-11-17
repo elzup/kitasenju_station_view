@@ -1,10 +1,16 @@
 <?php
 
-function load_trains() {
-    $url_head = 'https://api.tokyometroapp.jp/api/v2/datapoints';
-    $url_foot = '?rdf:type=odpt:Train&acl:consumerKey=' . ACCESS_TOKEN;
-    $url = $url_head . $url_foot;
-    $trains = json_decode(file_get_contents($url));
+function load_trains($railway = NULL) {
+    $params = array(
+        'rdf:type' => 'odpt:Train',
+        'acl:consumerKey' => ACCESS_TOKEN,
+    );
+    if (isset($railway)) {
+        $params['odpt:Railway'] = $railway;
+    }
+    $url = URL_API_HEAD . '?' . http_build_query($params);
+    $json = file_get_contents($url);
+    $trains = json_decode($json);
     $train_list = array();
     foreach ($trains as $train) {
         $train_list[] = new TrainData($train);
