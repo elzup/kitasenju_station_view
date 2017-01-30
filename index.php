@@ -56,7 +56,7 @@ $maptype = "ROADMAP";
 
 $locs = array();
 
-//foreach ($tweets as $i => $st) { 
+//foreach ($tweets as $i => $st) {
 //    if (!isset($st->geo)) continue;
 //    $locs[] = '["' . escape_js_string($st->text) . '", ' . $st->geo->coordinates[0] . ', ' . $st->geo->coordinates[1] . ']';
 //}
@@ -69,7 +69,7 @@ $locs = array();
     <title>東京メトロ RailMap</title>
 <link rel="stylesheet" href="./style.css">
     <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
-    <script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?key=<?= GOOGLE_API_KEY ?>&sensor=TRUE"></script>
+    <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=<?= GOOGLE_API_KEY ?>&sensor=TRUE"></script>
 <script>
 
 var map;
@@ -101,7 +101,7 @@ function initialize() {
             var st = railway.stations[j];
             var lat = st.location.lat;
             var lon = st.location.lon;
-    
+
             set_marker_station(col, lat, lon, map, infowindow, st.name, st.code);
             if (pre_loc) {
                 var points = [
@@ -171,7 +171,7 @@ function set_marker_station(col, lat, lon, map, infowindow, text, code) {
 
 function set_marker_train(train, map, infowindow) {
     //var img_path = "images/allow.png";
-    var img_path = "http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|" + train.color;
+    var img_path = "https://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|" + train.color;
 //        new google.maps.Size(40, 40),
 //        new google.maps.Point(0, 0),
 //        new google.maps.Point(10, 10),
